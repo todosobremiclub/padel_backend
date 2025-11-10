@@ -84,4 +84,5 @@ const deleteClub = async (req, res) => {
   }
 };
 
+module.exports = { getClubes, getClubById, createClub, updateClub, deleteClub };
 
