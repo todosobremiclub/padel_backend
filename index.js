@@ -3,20 +3,12 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 require('dotenv').config();
-const db = require('./db');
+const db = require('./db'); // Aquí tienes acceso a db.query
 
 const app = express();
 
-// Conexión a la base de datos
-db.connect()
-  .then(() => console.log('✅ Base de datos conectada'))
-  .catch(err => {
-    console.error('❌ Error al conectar la base de datos:', err);
-    process.exit(1); // Detener la app si no hay conexión
-  });
-
 // Middlewares
-app.use(helmet()); // Seguridad básica
+app.use(helmet());
 app.use(cors());
 app.use(express.json());
 
@@ -30,12 +22,18 @@ app.use('/usuarios', usuariosRoutes);
 app.use('/auth', authRoutes);
 app.use(express.static('public'));
 
-// Ruta raíz para probar
-app.get('/', (req, res) => {
-  res.send('API Padel Backend funcionando 🚀');
+// Ruta raíz para probar conexión a DB
+app.get('/', async (req, res) => {
+  try {
+    const result = await db.query('SELECT NOW()'); // Test rápido
+    res.send(`API Padel Backend funcionando 🚀 | DB OK: ${result.rows[0].now}`);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error conectando a la base de datos');
+  }
 });
 
-// Middleware para manejo global de errores
+// Middleware global de errores
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Algo salió mal en el servidor' });
@@ -46,3 +44,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
 });
+
