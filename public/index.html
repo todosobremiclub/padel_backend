@@ -40,6 +40,7 @@
   <script>
     const baseUrl = 'https://padel-backend-ysw0.onrender.com';
 
+    // LOGIN
     async function login() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
@@ -54,14 +55,17 @@
       if (data.token) {
         localStorage.setItem('token', data.token);
         alert('Login exitoso');
-        cargarClubesSelect(); // Cargar clubes en el select después del login
+        cargarClubesSelect();
       } else {
         alert('Error: ' + (data.message || 'Credenciales inválidas'));
       }
     }
 
+    // CREAR CLUB
     async function crearClub() {
       const token = localStorage.getItem('token');
+      if (!token) return alert('Debes iniciar sesión primero');
+
       const club = {
         nombre: document.getElementById('nombre').value,
         direccion: document.getElementById('direccion').value,
@@ -85,13 +89,16 @@
       cargarClubesSelect();
     }
 
+    // LISTAR CLUBES
     async function getClubes() {
       const token = localStorage.getItem('token');
+      if (!token) return alert('Debes iniciar sesión primero');
+
       const res = await fetch(`${baseUrl}/clubes`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      const data = await res.json();
 
+      const data = await res.json();
       let html = '<table border="1" cellpadding="5"><tr><th>ID</th><th>Nombre</th><th>Acciones</th></tr>';
       data.forEach(club => {
         html += `<tr>
@@ -104,13 +111,16 @@
       document.getElementById('resultado').innerHTML = html;
     }
 
+    // CARGAR CLUBES EN SELECT
     async function cargarClubesSelect() {
       const token = localStorage.getItem('token');
+      if (!token) return;
+
       const res = await fetch(`${baseUrl}/clubes`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      const data = await res.json();
 
+      const data = await res.json();
       const select = document.getElementById('usuario_club');
       select.innerHTML = '<option value="">Selecciona un club</option>';
       data.forEach(club => {
@@ -118,13 +128,16 @@
       });
     }
 
+    // CREAR USUARIO ADMIN
     async function crearUsuario() {
       const token = localStorage.getItem('token');
+      if (!token) return alert('Debes iniciar sesión primero');
+
       const usuario = {
         nombre: document.getElementById('usuario_nombre').value,
         email: document.getElementById('usuario_email').value,
         password: document.getElementById('usuario_password').value,
-        rol: 'admin_club',
+        rol: 'CLUB_ADMIN',
         club_id: document.getElementById('usuario_club').value
       };
 

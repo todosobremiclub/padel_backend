@@ -18,4 +18,3 @@ router.post('/', verifyToken, allowRoles('SUPER_ADMIN'), createClub);
 router.put('/:id', verifyToken, allowRoles('SUPER_ADMIN'), updateClub);
 router.delete('/:id', verifyToken, allowRoles('SUPER_ADMIN'), deleteClub);
 
-module.exports = router;
