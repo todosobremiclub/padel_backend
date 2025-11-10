@@ -1,29 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../db');
+const {
+  getClubes,
+  getClubById,
+  createClub,
+  updateClub,
+  deleteClub
+} = require('../controllers/clubesController');
 
-// Obtener todos los clubes
-router.get('/', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM clubes');
-    res.json(result.rows);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+const verifyToken = require('../middlewares/authMiddleware');
+const allowRoles = require('../middlewares/roleMiddleware');
 
-// Crear un club
-router.post('/', async (req, res) => {
-  const { nombre, direccion, contacto_nombre, contacto_telefono, logo_url } = req.body;
-  try {
-    const result = await pool.query(
-      'INSERT INTO clubes (nombre, direccion, contacto_nombre, contacto_telefono, logo_url) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [nombre, direccion, contacto_nombre, contacto_telefono, logo_url]
-    );
-    res.json(result.rows[0]);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+// Endpoints protegidos
+router.get('/', verifyToken, allowRoles('SUPER_ADMIN', 'CLUB_ADMIN'), getClubes);
+router.get('/:id', verifyToken, allowRoles('SUPER_ADMIN', 'CLUB_ADMIN'), getClubById);
+router.post('/', verifyToken, allowRoles('SUPER_ADMIN'), createClub);
+router.put('/:id', verifyToken, allowRoles('SUPER_ADMIN'), updateClub);
+router.delete('/:id', verifyToken, allowRoles('SUPER_ADMIN'), deleteClub);
 
 module.exports = router;
