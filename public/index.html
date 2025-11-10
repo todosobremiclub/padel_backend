@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Prueba Padel Backend</title>
+  <title>Panel Super Admin - Padel</title>
 </head>
 <body>
   <h1>Login</h1>
@@ -10,9 +10,32 @@
   <input type="password" id="password" placeholder="Password">
   <button onclick="login()">Ingresar</button>
 
-  <h2>Clubes</h2>
+  <hr>
+
+  <h2>Crear Club</h2>
+  <input type="text" id="nombre" placeholder="Nombre del club">
+  <input type="text" id="direccion" placeholder="Dirección">
+  <input type="text" id="contacto_nombre" placeholder="Nombre de contacto">
+  <input type="text" id="contacto_telefono" placeholder="Teléfono">
+  <input type="text" id="logo" placeholder="URL del logo">
+  <button onclick="crearClub()">Crear Club</button>
+
+  <hr>
+
+  <h2>Lista de Clubes</h2>
   <button onclick="getClubes()">Ver Clubes</button>
-  <pre id="resultado"></pre>
+  <div id="resultado"></div>
+
+  <hr>
+
+  <h2>Crear Usuario Administrador</h2>
+  <input type="text" id="usuario_nombre" placeholder="Nombre del usuario">
+  <input type="email" id="usuario_email" placeholder="Email">
+  <input type="password" id="usuario_password" placeholder="Password">
+  <select id="usuario_club">
+    <option value="">Selecciona un club</option>
+  </select>
+  <button onclick="crearUsuario()">Crear Usuario</button>
 
   <script>
     const baseUrl = 'https://padel-backend-ysw0.onrender.com';
@@ -31,9 +54,35 @@
       if (data.token) {
         localStorage.setItem('token', data.token);
         alert('Login exitoso');
+        cargarClubesSelect(); // Cargar clubes en el select después del login
       } else {
         alert('Error: ' + (data.message || 'Credenciales inválidas'));
       }
+    }
+
+    async function crearClub() {
+      const token = localStorage.getItem('token');
+      const club = {
+        nombre: document.getElementById('nombre').value,
+        direccion: document.getElementById('direccion').value,
+        contacto_nombre: document.getElementById('contacto_nombre').value,
+        contacto_telefono: document.getElementById('contacto_telefono').value,
+        logo: document.getElementById('logo').value
+      };
+
+      const res = await fetch(`${baseUrl}/clubes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(club)
+      });
+
+      const data = await res.json();
+      alert(data.message || 'Club creado');
+      getClubes();
+      cargarClubesSelect();
     }
 
     async function getClubes() {
@@ -42,7 +91,54 @@
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
-      document.getElementById('resultado').textContent = JSON.stringify(data, null, 2);
+
+      let html = '<table border="1" cellpadding="5"><tr><th>ID</th><th>Nombre</th><th>Acciones</th></tr>';
+      data.forEach(club => {
+        html += `<tr>
+          <td>${club.id}</td>
+          <td>${club.nombre}</td>
+          <td><a href="/club/${club.id}" target="_blank">Ver página</a></td>
+        </tr>`;
+      });
+      html += '</table>';
+      document.getElementById('resultado').innerHTML = html;
+    }
+
+    async function cargarClubesSelect() {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${baseUrl}/clubes`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+
+      const select = document.getElementById('usuario_club');
+      select.innerHTML = '<option value="">Selecciona un club</option>';
+      data.forEach(club => {
+        select.innerHTML += `<option value="${club.id}">${club.nombre}</option>`;
+      });
+    }
+
+    async function crearUsuario() {
+      const token = localStorage.getItem('token');
+      const usuario = {
+        nombre: document.getElementById('usuario_nombre').value,
+        email: document.getElementById('usuario_email').value,
+        password: document.getElementById('usuario_password').value,
+        rol: 'admin_club',
+        club_id: document.getElementById('usuario_club').value
+      };
+
+      const res = await fetch(`${baseUrl}/usuarios`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(usuario)
+      });
+
+      const data = await res.json();
+      alert(data.message || 'Usuario creado');
     }
   </script>
 </body>
