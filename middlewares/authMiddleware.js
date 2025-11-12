@@ -8,8 +8,9 @@ const verifyToken = (req, res, next) => {
 
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) return res.status(403).json({ message: 'Token inválido' });
-    req.user = user; // { id, rol, club_id }
+    req.user = user;
     next();
   });
 };
 
+module.exports = verifyToken; // ✅ IMPORTANTE
