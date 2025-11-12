@@ -7,3 +7,4 @@ const allowRoles = (...roles) => {
   };
 };
 
+module.exports = allowRoles; // ✅ IMPORTANTE
