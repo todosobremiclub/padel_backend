@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-  <meta charset="UTF-8">
   <title>Iniciar sesión</title>
 </head>
 <body>
@@ -10,30 +9,7 @@
     <input type="email" id="email" placeholder="Correo electrónico" required>
     <input type="password" id="password" placeholder="Contraseña" required>
     <button type="submit">Ingresar</button>
+    <div id="errorMsg"></div>
   </form>
-  <p id="errorMsg"></p>
-  <script>
-    const baseUrl = 'https://padel-backend-ysw0.onrender.com';
-
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-
-      const res = await fetch(`${baseUrl}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-
-      const data = await res.json();
-      if (data.token) {
-        localStorage.setItem('token', data.token);
-        window.location.href = '/admin.html';
-      } else {
-        document.getElementById('errorMsg').textContent = data.message || 'Credenciales inválidas';
-      }
-    });
-  </script>
+  <script src="login.js"></script>
 </body>
-</html>
