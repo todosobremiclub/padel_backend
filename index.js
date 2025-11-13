@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 require('dotenv').config();
+const path = require('path');
 const db = require('./db'); // Conexión PostgreSQL
 
 const app = express();
@@ -10,11 +11,11 @@ const app = express();
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public')); // Archivos estáticos (CSS, imágenes)
+app.use(express.static(path.join(__dirname, 'public'))); // Archivos estáticos (CSS, JS, imágenes)
 
 // Configuración de EJS
 app.set('view engine', 'ejs');
-app.set('views', './views'); // Carpeta donde estarán las plantillas
+app.set('views', path.join(__dirname, 'views')); // Carpeta donde estarán las plantillas
 
 // Rutas API
 const clubesRoutes = require('./routes/clubes');
@@ -34,6 +35,16 @@ app.get('/', async (req, res) => {
     console.error(err);
     res.status(500).send('Error conectando a la base de datos');
   }
+});
+
+// Página de login
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+// Página de administración (protegida por token en frontend)
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
 // Ruta dinámica para mostrar la página del club
@@ -61,5 +72,5 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
-});
+
 
