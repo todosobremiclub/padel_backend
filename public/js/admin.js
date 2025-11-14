@@ -1,65 +1,95 @@
-// Ver lista de clubes
-document.getElementById('verClubesBtn').addEventListener('click', async () => {
-  const token = localStorage.getItem('token');
-  const response = await fetch('/clubes', {
+const baseUrl = 'https://padel-backend-ysw0.onrender.com';
+
+// Verifica si hay token, si no, redirige al login
+const token = localStorage.getItem('token');
+if (!token) {
+  window.location.href = '/login.html';
+}
+
+// CREAR CLUB
+document.getElementById('crearClubForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const club = {
+    nombre: document.getElementById('nombre').value,
+    direccion: document.getElementById('direccion').value,
+    contacto_nombre: document.getElementById('contacto_nombre').value,
+    contacto_telefono: document.getElementById('contacto_telefono').value,
+    logo: document.getElementById('logo').value
+  };
+
+  const res = await fetch(`${baseUrl}/clubes`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(club)
+  });
+
+  const data = await res.json();
+  alert(data.message || 'Club creado');
+  getClubes();
+  cargarClubesSelect();
+});
+
+// LISTAR CLUBES
+document.getElementById('verClubesBtn').addEventListener('click', getClubes);
+
+async function getClubes() {
+  const res = await fetch(`${baseUrl}/clubes`, {
     headers: { 'Authorization': `Bearer ${token}` }
   });
-  const clubes = await response.json();
-  // Aquí podrías mostrar los clubes en el HTML, por ahora solo en consola:
-  console.log(clubes);
-});
 
-// Crear club
-document.getElementById('crearClubBtn').addEventListener('click', async () => {
-  const token = localStorage.getItem('token');
-  const nombre = document.getElementById('nombreClub').value;
-  const direccion = document.getElementById('direccionClub').value;
-  const contacto = document.getElementById('contactoClub').value;
-  const telefono = document.getElementById('telefonoClub').value;
-  const logo = document.getElementById('logoClub').value;
+  const data = await res.json();
+  let html = '<table border="1" cellpadding="5"><tr><th>ID</th><th>Nombre</th><th>Acciones</th></tr>';
+  data.forEach(club => {
+    html += `<tr>
+      <td>${club.id}</td>
+      <td>${club.nombre}</td>
+      <td><a href="/club/${club.id}" target="_blank">Ver página</a></td>
+    </tr>`;
+  });
+  html += '</table>';
+  document.getElementById('resultado').innerHTML = html;
+}
 
-  const response = await fetch('/clubes', {
+// CARGAR CLUBES EN SELECT
+async function cargarClubesSelect() {
+  const res = await fetch(`${baseUrl}/clubes`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+
+  const data = await res.json();
+  const select = document.getElementById('usuario_club');
+  select.innerHTML = '<option value="">Selecciona un club</option>';
+  data.forEach(club => {
+    select.innerHTML += `<option value="${club.id}">${club.nombre}</option>`;
+  });
+}
+
+// CREAR USUARIO ADMIN
+document.getElementById('crearUsuarioForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const usuario = {
+    nombre: document.getElementById('usuario_nombre').value,
+    email: document.getElementById('usuario_email').value,
+    password: document.getElementById('usuario_password').value,
+    rol: 'CLUB_ADMIN',
+    club_id: document.getElementById('usuario_club').value
+  };
+
+  const res = await fetch(`${baseUrl}/usuarios`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${token}`
     },
-    body: JSON.stringify({
-      nombre,
-      direccion,
-      contacto,
-      telefono,
-      logo
-    })
+    body: JSON.stringify(usuario)
   });
-  const result = await response.json();
-  // Muestra el resultado en consola o en el HTML
-  console.log(result);
+
+  const data = await res.json();
+  alert(data.message || 'Usuario creado');
 });
 
-// Crear usuario administrador
-document.getElementById('crearUsuarioBtn').addEventListener('click', async () => {
-  const token = localStorage.getItem('token');
-  const nombre = document.getElementById('nombreUsuario').value;
-  const email = document.getElementById('emailUsuario').value;
-  const password = document.getElementById('passwordUsuario').value;
-  const clubId = document.getElementById('clubesSelect').value;
-
-  const response = await fetch('/usuarios', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({
-      nombre,
-      email,
-      password,
-      club_id: clubId,
-      rol: 'admin'
-    })
-  });
-  const result = await response.json();
-  // Muestra el resultado en consola o en el HTML
-  console.log(result);
-});
+// Inicializa select de clubes al cargar la página
+cargarClubesSelect();
