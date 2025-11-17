@@ -25,6 +25,10 @@ document.getElementById('verClubBtn').onclick = async function() {
   const res = await fetch('/clubes/1', {
     headers: { 'Authorization': `Bearer ${token}` }
   });
+  if (!res.ok) {
+    alert('No se pudo obtener la información del club. Código: ' + res.status);
+    return;
+  }
   const data = await res.json();
   document.getElementById('clubInfo').textContent = JSON.stringify(data, null, 2);
 };
