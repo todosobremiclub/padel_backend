@@ -12,6 +12,19 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Obtener un club por ID
+router.get('/:id', async (req, res) => {
+  try {
+    const result = await db.query('SELECT * FROM clubes WHERE id = $1', [req.params.id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Club no encontrado' });
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener el club' });
+  }
+});
+
 // Editar club
 router.put('/:id', async (req, res) => {
   const { nombre, direccion, contacto_nombre, contacto_telefono, logo_url, descripcion } = req.body;
@@ -37,4 +50,3 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
-
