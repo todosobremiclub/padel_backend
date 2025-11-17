@@ -163,3 +163,8 @@ document.getElementById('crearUsuarioForm').addEventListener('submit', async (e)
 
 // Inicializa select de clubes al cargar la página
 cargarClubesSelect();
+
+// Botón para ir a la página del club
+document.getElementById('verPaginaBtn').onclick = function() {
+  window.location.href = 'club.html';
+};
