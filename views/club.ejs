@@ -1,13 +1,16 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-  <meta charset="UTF-8">
   <title><%= club.nombre %></title>
+  <style>
+    body { background: <%= club.color_principal || '#f5f5f5' %>; }
+    .logo { width: 150px; }
+  </style>
 </head>
 <body>
-  <h1>Bienvenido a <%= club.nombre %></h1>
-  <img src="<%= club.logo %>" alt="Logo del club" style="max-width:150px;">
+  <img src="<%= club.logo_url %>" class="logo" alt="Logo del club">
+  <h1><%= club.nombre %></h1>
   <p>Dirección: <%= club.direccion %></p>
-  <p>Contacto: <%= club.contacto_nombre %> - <%= club.contacto_telefono %></p>
+  <p>Contacto: <%= club.contacto_nombre %> (<%= club.contacto_telefono %>)</p>
+  <!-- Aquí puedes agregar más secciones personalizadas -->
 </body>
-</html>
