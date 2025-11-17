@@ -3,45 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <title>Panel Super Admin - Padel</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; }
+    input, select, textarea, button { margin: 4px 0; padding: 6px; }
+    table { border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #aaa; padding: 6px 12px; }
+    th { background: #f5f5f5; }
+    hr { margin: 30px 0; }
+    h2 { color: #1a73e8; }
+    .form-section { margin-bottom: 30px; }
+  </style>
 </head>
 <body>
   <h2>Panel Super Admin - Padel</h2>
 
   <!-- Crear Club -->
-  <h3>Crear Club</h3>
-  <form id="crearClubForm">
-    <input type="text" id="nombre" placeholder="Nombre del club" required>
-    <input type="text" id="direccion" placeholder="Dirección" required>
-    <input type="text" id="contacto_nombre" placeholder="Nombre de contacto" required>
-    <input type="text" id="contacto_telefono" placeholder="Teléfono de contacto" required>
-    <input type="text" id="logo" placeholder="URL del logo">
-    <input type="text" id="color_principal" placeholder="Color principal (ej: #1a73e8)">
-    <input type="text" id="color_secundario" placeholder="Color secundario (ej: #f5f5f5)">
-    <input type="text" id="fondo_url" placeholder="URL de imagen de fondo">
-    <textarea id="descripcion" placeholder="Descripción del club"></textarea>
-    <button type="submit">Crear club</button>
-  </form>
+  <div class="form-section">
+    <h3>Crear Club</h3>
+    <form id="crearClubForm">
+      <input type="text" id="nombre" placeholder="Nombre del club" required>
+      <input type="text" id="direccion" placeholder="Dirección" required>
+      <input type="text" id="contacto_nombre" placeholder="Nombre de contacto" required>
+      <input type="text" id="contacto_telefono" placeholder="Teléfono de contacto" required>
+      <input type="text" id="logo" placeholder="URL del logo">
+      <input type="text" id="color_principal" placeholder="Color principal (ej: #1a73e8)">
+      <input type="text" id="color_secundario" placeholder="Color secundario (ej: #f5f5f5)">
+      <input type="text" id="fondo_url" placeholder="URL de imagen de fondo">
+      <textarea id="descripcion" placeholder="Descripción del club"></textarea>
+      <br>
+      <button type="submit">Crear club</button>
+    </form>
+  </div>
 
   <hr>
 
   <!-- Lista de Clubes -->
-  <h3>Lista de Clubes</h3>
-  <button id="verClubesBtn">Ver Clubes</button>
-  <div id="resultado"></div>
+  <div class="form-section">
+    <h3>Lista de Clubes</h3>
+    <button id="verClubesBtn">Ver Clubes</button>
+    <div id="resultado"></div>
+  </div>
 
   <hr>
 
   <!-- Crear Usuario Administrador -->
-  <h3>Crear Usuario Administrador</h3>
-  <form id="crearUsuarioForm">
-    <input type="text" id="usuario_nombre" placeholder="Nombre del usuario" required>
-    <input type="email" id="usuario_email" placeholder="Email" required>
-    <input type="password" id="usuario_password" placeholder="Password" required>
-    <select id="usuario_club">
-      <option value="">Selecciona un club</option>
-    </select>
-    <button type="submit">Crear Usuario</button>
-  </form>
+  <div class="form-section">
+    <h3>Crear Usuario Administrador</h3>
+    <form id="crearUsuarioForm">
+      <input type="text" id="usuario_nombre" placeholder="Nombre del usuario" required>
+      <input type="email" id="usuario_email" placeholder="Email" required>
+      <input type="password" id="usuario_password" placeholder="Password" required>
+      <select id="usuario_club">
+        <option value="">Selecciona un club</option>
+      </select>
+      <button type="submit">Crear Usuario</button>
+    </form>
+  </div>
+
+  <hr>
+
+  <!-- Lista de Usuarios -->
+  <div class="form-section">
+    <div id="usuariosResultado"></div>
+  </div>
 
   <hr>
   <!-- Botón para ir a la página del club -->
@@ -51,3 +75,4 @@
   <script src="js/admin.js"></script>
 </body>
 </html>
+

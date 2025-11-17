@@ -1,21 +1,29 @@
 const express = require('express');
 const router = express.Router();
+const db = require('../db');
 
-const verifyToken = require('../middlewares/authMiddleware');
-const allowRoles = require('../middlewares/roleMiddleware');
-const {
-  getClubes,
-  getClubById,
-  createClub,
-  updateClub,
-  deleteClub
-} = require('../controllers/clubesController');
+// Editar club
+router.put('/:id', async (req, res) => {
+  const { nombre, direccion, contacto_nombre, contacto_telefono, logo_url, descripcion } = req.body;
+  try {
+    await db.query(
+      'UPDATE clubes SET nombre=$1, direccion=$2, contacto_nombre=$3, contacto_telefono=$4, logo_url=$5, descripcion=$6 WHERE id=$7',
+      [nombre, direccion, contacto_nombre, contacto_telefono, logo_url, descripcion, req.params.id]
+    );
+    res.json({ message: 'Club actualizado' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al actualizar club' });
+  }
+});
 
-// Endpoints protegidos
-router.get('/', verifyToken, allowRoles('SuperAdmin', 'ClubAdmin'), getClubes);
-router.get('/:id', verifyToken, allowRoles('SuperAdmin', 'ClubAdmin'), getClubById);
-router.post('/', verifyToken, allowRoles('SuperAdmin'), createClub);
-router.put('/:id', verifyToken, allowRoles('SuperAdmin'), updateClub);
-router.delete('/:id', verifyToken, allowRoles('SuperAdmin'), deleteClub);
+// Eliminar club
+router.delete('/:id', async (req, res) => {
+  try {
+    await db.query('DELETE FROM clubes WHERE id=$1', [req.params.id]);
+    res.json({ message: 'Club eliminado' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al eliminar club' });
+  }
+});
 
 module.exports = router;
