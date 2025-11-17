@@ -37,7 +37,11 @@ document.getElementById('crearClubForm').addEventListener('submit', async (e) =>
     direccion: document.getElementById('direccion').value.trim(),
     contacto_nombre: document.getElementById('contacto_nombre').value.trim(),
     contacto_telefono: document.getElementById('contacto_telefono').value.trim(),
-    logo: document.getElementById('logo').value.trim()
+    logo_url: document.getElementById('logo').value.trim(),
+    color_principal: document.getElementById('color_principal').value.trim(),
+    color_secundario: document.getElementById('color_secundario').value.trim(),
+    fondo_url: document.getElementById('fondo_url').value.trim(),
+    descripcion: document.getElementById('descripcion').value.trim()
   };
 
   try {
@@ -134,7 +138,7 @@ document.getElementById('crearUsuarioForm').addEventListener('submit', async (e)
     nombre,
     email,
     password,
-    rol: 'CLUB_ADMIN',
+    rol: 'ClubAdmin',
     club_id
   };
 
