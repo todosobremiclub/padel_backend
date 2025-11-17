@@ -2,6 +2,16 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
+// Listar clubes
+router.get('/', async (req, res) => {
+  try {
+    const result = await db.query('SELECT * FROM clubes');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener clubes' });
+  }
+});
+
 // Editar club
 router.put('/:id', async (req, res) => {
   const { nombre, direccion, contacto_nombre, contacto_telefono, logo_url, descripcion } = req.body;
@@ -26,4 +36,3 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-module.exports = router;
