@@ -3,9 +3,9 @@ const baseUrl = 'https://padel-backend-ysw0.onrender.com';
 // Verifica si hay token, si no, redirige al login
 const token = localStorage.getItem('token');
 if (!token) {
+  alert('Token no encontrado. Inicia sesión nuevamente.');
   window.location.href = '/login.html';
 }
-
 // CREAR CLUB
 document.getElementById('crearClubForm').addEventListener('submit', async (e) => {
   e.preventDefault();
