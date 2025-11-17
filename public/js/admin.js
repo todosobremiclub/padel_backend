@@ -6,89 +6,155 @@ if (!token) {
   alert('Token no encontrado. Inicia sesión nuevamente.');
   window.location.href = '/login.html';
 }
+
+// Función para manejar errores de fetch
+function handleFetchError(res) {
+  if (res.status === 403) {
+    alert('Acceso prohibido (403). Tu sesión expiró o no tienes permisos. Inicia sesión nuevamente.');
+    window.location.href = '/login.html';
+    return true;
+  }
+  if (!res.ok) {
+    alert('Error en la petición: ' + res.status);
+    return true;
+  }
+  return false;
+}
+
 // CREAR CLUB
 document.getElementById('crearClubForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+
+  // Validación básica
+  const nombre = document.getElementById('nombre').value.trim();
+  if (!nombre) {
+    alert('El nombre del club es obligatorio');
+    return;
+  }
+
   const club = {
-    nombre: document.getElementById('nombre').value,
-    direccion: document.getElementById('direccion').value,
-    contacto_nombre: document.getElementById('contacto_nombre').value,
-    contacto_telefono: document.getElementById('contacto_telefono').value,
-    logo: document.getElementById('logo').value
+    nombre,
+    direccion: document.getElementById('direccion').value.trim(),
+    contacto_nombre: document.getElementById('contacto_nombre').value.trim(),
+    contacto_telefono: document.getElementById('contacto_telefono').value.trim(),
+    logo: document.getElementById('logo').value.trim()
   };
 
-  const res = await fetch(`${baseUrl}/clubes`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify(club)
-  });
+  try {
+    const res = await fetch(`${baseUrl}/clubes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(club)
+    });
 
-  const data = await res.json();
-  alert(data.message || 'Club creado');
-  getClubes();
-  cargarClubesSelect();
+    if (handleFetchError(res)) return;
+
+    const data = await res.json();
+    alert(data.message || 'Club creado');
+    await getClubes();
+    await cargarClubesSelect();
+  } catch (error) {
+    alert('Hubo un problema: ' + error.message);
+  }
 });
 
 // LISTAR CLUBES
 document.getElementById('verClubesBtn').addEventListener('click', getClubes);
 
 async function getClubes() {
-  const res = await fetch(`${baseUrl}/clubes`, {
-    headers: { 'Authorization': `Bearer ${token}` }
-  });
+  try {
+    const res = await fetch(`${baseUrl}/clubes`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
 
-  const data = await res.json();
-  let html = '<table border="1" cellpadding="5"><tr><th>ID</th><th>Nombre</th><th>Acciones</th></tr>';
-  data.forEach(club => {
-    html += `<tr>
-      <td>${club.id}</td>
-      <td>${club.nombre}</td>
-      <td><a href="/club/${club.id}" target="_blank">Ver página</a></td>
-    </tr>`;
-  });
-  html += '</table>';
-  document.getElementById('resultado').innerHTML = html;
+    if (handleFetchError(res)) return;
+
+    const data = await res.json();
+    if (!Array.isArray(data)) {
+      alert('No se pudo obtener la lista de clubes.');
+      return;
+    }
+
+    let html = '<table border="1" cellpadding="5"><tr><th>ID</th><th>Nombre</th><th>Acciones</th></tr>';
+    data.forEach(club => {
+      html += `<tr>
+        <td>${club.id}</td>
+        <td>${club.nombre}</td>
+        <td><a href="/club/${club.id}" target="_blank">Ver página</a></td>
+      </tr>`;
+    });
+    html += '</table>';
+    document.getElementById('resultado').innerHTML = html;
+  } catch (error) {
+    alert('Hubo un problema al listar clubes: ' + error.message);
+  }
 }
 
 // CARGAR CLUBES EN SELECT
 async function cargarClubesSelect() {
-  const res = await fetch(`${baseUrl}/clubes`, {
-    headers: { 'Authorization': `Bearer ${token}` }
-  });
+  try {
+    const res = await fetch(`${baseUrl}/clubes`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
 
-  const data = await res.json();
-  const select = document.getElementById('usuario_club');
-  select.innerHTML = '<option value="">Selecciona un club</option>';
-  data.forEach(club => {
-    select.innerHTML += `<option value="${club.id}">${club.nombre}</option>`;
-  });
+    if (handleFetchError(res)) return;
+
+    const data = await res.json();
+    const select = document.getElementById('usuario_club');
+    select.innerHTML = '<option value="">Selecciona un club</option>';
+    if (Array.isArray(data)) {
+      data.forEach(club => {
+        select.innerHTML += `<option value="${club.id}">${club.nombre}</option>`;
+      });
+    }
+  } catch (error) {
+    alert('Hubo un problema al cargar clubes: ' + error.message);
+  }
 }
 
 // CREAR USUARIO ADMIN
 document.getElementById('crearUsuarioForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+
+  // Validación básica
+  const nombre = document.getElementById('usuario_nombre').value.trim();
+  const email = document.getElementById('usuario_email').value.trim();
+  const password = document.getElementById('usuario_password').value.trim();
+  const club_id = document.getElementById('usuario_club').value;
+
+  if (!nombre || !email || !password || !club_id) {
+    alert('Todos los campos son obligatorios para crear el usuario.');
+    return;
+  }
+
   const usuario = {
-    nombre: document.getElementById('usuario_nombre').value,
-    email: document.getElementById('usuario_email').value,
-    password: document.getElementById('usuario_password').value,
+    nombre,
+    email,
+    password,
     rol: 'CLUB_ADMIN',
-    club_id: document.getElementById('usuario_club').value
+    club_id
   };
 
-  const res = await fetch(`${baseUrl}/usuarios`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify(usuario)
-  });
+  try {
+    const res = await fetch(`${baseUrl}/usuarios`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(usuario)
+    });
 
-  const data = await res.json();
-  alert(data.message || 'Usuario creado');
+    if (handleFetchError(res)) return;
+
+    const data = await res.json();
+    alert(data.message || 'Usuario creado');
+  } catch (error) {
+    alert('Hubo un problema al crear el usuario: ' + error.message);
+  }
 });
 
 // Inicializa select de clubes al cargar la página
