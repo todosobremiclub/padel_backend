@@ -1,0 +1,51 @@
+<!-- public/club.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Club de Pádel</title>
+</head>
+<body>
+  <h1>Ver Club</h1>
+  <form id="loginForm">
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Contraseña" required>
+    <button type="submit">Ingresar</button>
+  </form>
+  <button id="verClubBtn" style="display:none;">Ver Club</button>
+  <pre id="clubInfo"></pre>
+
+  <script>
+    let token = null;
+
+    document.getElementById('loginForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const res = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (data.token) {
+        token = data.token;
+        document.getElementById('verClubBtn').style.display = 'inline';
+        alert('Login exitoso');
+      } else {
+        alert('Login fallido');
+      }
+    };
+
+    document.getElementById('verClubBtn').onclick = async function() {
+      const res = await fetch('/clubes/1', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      document.getElementById('clubInfo').textContent = JSON.stringify(data, null, 2);
+    };
+  </script>
+</body>
+</html>
