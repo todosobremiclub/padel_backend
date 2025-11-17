@@ -12,7 +12,7 @@ const {
 } = require('../controllers/clubesController');
 
 // Endpoints protegidos
-router.get('/', verifyToken, allowRoles('SUPER_ADMIN', 'CLUB_ADMIN'), getClubes);
+router.get('/', verifyToken, allowRoles('SuperAdmin', 'ClubAdmin'), getClubes);
 router.get('/:id', verifyToken, allowRoles('SUPER_ADMIN', 'CLUB_ADMIN'), getClubById);
 router.post('/', verifyToken, allowRoles('SUPER_ADMIN'), createClub);
 router.put('/:id', verifyToken, allowRoles('SUPER_ADMIN'), updateClub);
