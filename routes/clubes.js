@@ -13,9 +13,9 @@ const {
 
 // Endpoints protegidos
 router.get('/', verifyToken, allowRoles('SuperAdmin', 'ClubAdmin'), getClubes);
-router.get('/:id', verifyToken, allowRoles('SUPER_ADMIN', 'CLUB_ADMIN'), getClubById);
+router.get('/:id', verifyToken, allowRoles('SuperAdmin', 'ClubAdmin'), getClubById);
 router.post('/', verifyToken, allowRoles('SuperAdmin'), createClub);
-router.put('/:id', verifyToken, allowRoles('SUPER_ADMIN'), updateClub);
-router.delete('/:id', verifyToken, allowRoles('SUPER_ADMIN'), deleteClub);
+router.put('/:id', verifyToken, allowRoles('SuperAdmin'), updateClub);
+router.delete('/:id', verifyToken, allowRoles('SuperAdmin'), deleteClub);
 
 module.exports = router;
