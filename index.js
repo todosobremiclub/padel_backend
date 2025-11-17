@@ -5,6 +5,9 @@ require('dotenv').config();
 const path = require('path');
 const db = require('./db'); // Conexión PostgreSQL
 
+const verifyToken = require('./middlewares/authMiddleware');
+const allowRoles = require('./middlewares/roleMiddleware');
+
 const app = express();
 
 // Middlewares
@@ -47,11 +50,15 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// Ruta dinámica para mostrar la página del club
-app.get('/club/:id', async (req, res) => {
-  const { id } = req.params;
+// Ruta dinámica para mostrar la página del club (protegida)
+app.get('/club/:id', verifyToken, allowRoles('ClubAdmin', 'SuperAdmin'), async (req, res) => {
+  const clubId = parseInt(req.params.id);
   try {
-    const result = await db.query('SELECT * FROM clubes WHERE id = $1', [id]);
+    // Si el usuario es ClubAdmin, solo puede ver su propio club
+    if (req.user.rol === 'ClubAdmin' && req.user.club_id !== clubId) {
+      return res.status(403).send('No tienes permisos para ver este club');
+    }
+    const result = await db.query('SELECT * FROM clubes WHERE id = $1', [clubId]);
     if (result.rows.length === 0) {
       return res.status(404).send('Club no encontrado');
     }
@@ -72,5 +79,4 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
-
 });
