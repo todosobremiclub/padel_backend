@@ -5,17 +5,33 @@
   <title>Club de Pádel</title>
 </head>
 <body>
-  <h1>Ver Club</h1>
-  <form id="loginForm">
-    <h2>Login</h2>
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Contraseña" required>
-    <button type="submit">Ingresar</button>
-  </form>
-  <button id="verClubBtn" style="display:none;">Ver Club</button>
-  <pre id="clubInfo"></pre>
+  <div id="clubInfo"></div>
+  <script>
+    // Obtener el parámetro id de la URL
+    const params = new URLSearchParams(window.location.search);
+    const clubId = params.get('id');
 
-  <!-- Enlaza el JS externo -->
-  <script src="js/club.js"></script>
+    if (clubId) {
+      fetch(`/clubes/${clubId}`)
+        .then(res => {
+          if (!res.ok) throw new Error('No se pudo obtener el club');
+          return res.json();
+        })
+        .then(club => {
+          document.getElementById('clubInfo').innerHTML = `
+            <h1>${club.nombre}</h1>
+            <img src="${club.logo_url}" alt="Logo" style="max-width:200px;"><br>
+            <strong>Dirección:</strong> ${club.direccion}<br>
+            <strong>Contacto:</strong> ${club.contacto_nombre} (${club.contacto_telefono})<br>
+            <p>${club.descripcion || ''}</p>
+          `;
+        })
+        .catch(err => {
+          document.getElementById('clubInfo').textContent = err.message;
+        });
+    } else {
+      document.getElementById('clubInfo').textContent = 'No se especificó club';
+    }
+  </script>
 </body>
 </html>

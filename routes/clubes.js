@@ -25,6 +25,20 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// Crear club (devuelve el ID del club creado)
+router.post('/', async (req, res) => {
+  const { nombre, direccion, contacto_nombre, contacto_telefono, logo_url, color_principal, color_secundario, fondo_url, descripcion } = req.body;
+  try {
+    const result = await db.query(
+      'INSERT INTO clubes (nombre, direccion, contacto_nombre, contacto_telefono, logo_url, color_principal, color_secundario, fondo_url, descripcion) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id',
+      [nombre, direccion, contacto_nombre, contacto_telefono, logo_url, color_principal, color_secundario, fondo_url, descripcion]
+    );
+    res.json({ message: 'Club creado', id: result.rows[0].id });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al crear club' });
+  }
+});
+
 // Editar club
 router.put('/:id', async (req, res) => {
   const { nombre, direccion, contacto_nombre, contacto_telefono, logo_url, descripcion } = req.body;

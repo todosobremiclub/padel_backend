@@ -47,7 +47,15 @@ document.getElementById('crearClubForm').addEventListener('submit', async (e) =>
       body: JSON.stringify(club)
     });
     if (handleFetchError(res)) return;
-    alert('Club creado');
+    const data = await res.json();
+    if (data.id) {
+      // Muestra el link automáticamente
+      const link = `${window.location.origin}/club.html?id=${data.id}`;
+      document.getElementById('clubLink').innerHTML = `<strong>Web del club:</strong> <a href="${link}" target="_blank">${link}</a>`;
+      alert('Club creado. Web: ' + link);
+    } else {
+      alert('Club creado');
+    }
     getClubes();
     cargarClubesSelect();
     e.target.reset();
@@ -71,7 +79,7 @@ async function getClubes() {
         <td>${club.id}</td>
         <td>${club.nombre}</td>
         <td>
-          <a href="/club/${club.id}" target="_blank">Ver página</a>
+          <a href="club.html?id=${club.id}" target="_blank">Ver página</a>
           <button onclick="mostrarEditarClub(${club.id}, '${club.nombre}', '${club.direccion || ''}', '${club.contacto_nombre || ''}', '${club.contacto_telefono || ''}', '${club.logo_url || ''}', '${club.descripcion || ''}')">Editar</button>
           <button onclick="eliminarClub(${club.id})">Eliminar</button>
         </td>
@@ -291,9 +299,6 @@ window.eliminarUsuario = async function(id) {
 
 cargarClubesSelect();
 getClubes();
-getUsuarios();
-
-// Botón para ir a la página del club
-document.getElementById('verPaginaBtn').onclick = function() {
+getument.getElementById('verPaginaBtn').onclick = function() {
   window.location.href = 'club.html';
 };
